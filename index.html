@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link rel='icon' type='image/png' href='src/site/favicon.png'>
+    <title>
+        courseFillUp
+    </title>
+    <style>
+        html {
+            font-family: Baskerville, Baskerville Old Face, Hoefler Text, Garamond, Times New Roman, serif;
+        }
+
+        body {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        article {
+            padding: 0 20px;
+            /* As it will be on the website */
+        }
+
+        main {
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 700px) {
+            article {
+                width: 100%;
+            }
+
+            main {
+                width: 100%;
+            }
+        }
+
+        main>div {
+            align-self: center;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #d3d3d3;
+            width: 100%;
+        }
+
+        a,
+        a:hover,
+        a:link {
+            text-decoration: none;
+            color: black;
+            margin: 5px 0;
+        }
+    </style>
+<script defer src="dist/courseFillUp-bundle.js"></script></head>
+
+<body>
+    <article>
+        <main>
+            <h1>
+                courseFillUp
+            </h1>
+            <!--
+
+                    ADD PLOTS HERE:
+
+                -->
+            <div id="coursefillup-deptFillUpDots"></div>
+            <div id="coursefillup-bars"></div>
+            <div id="coursefillup-course-ts"></div>
+        </main>
+        <a href="https://dailynexus.com/category/labyrinth/">The Daily Nexus Labyrinth</a>
+    </article>
+</body>
+
+</html>

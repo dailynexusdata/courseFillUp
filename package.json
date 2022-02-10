@@ -1,0 +1,40 @@
+{
+  "name": "courseFillUp",
+  "version": "1.0.0",
+  "description": "Built From Daily Nexus D3 Template -- npm init @dailynexus/starter",
+  "scripts": {
+    "start": "webpack --watch --mode development",
+    "build": "webpack --mode production",
+    "doc": "jsdoc -r src/plots"
+  },
+  "author": "alex",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^6.2.0",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "html-webpack-plugin": "^5.3.1",
+    "jsdoc": "^3.6.7",
+    "prettier": "^2.3.2",
+    "sass": "^1.37.0",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.2.1",
+    "webpack": "^5.50.0",
+    "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "d3-array": "^3.0.2",
+    "d3-axis": "^3.0.0",
+    "d3-collection": "^1.0.7",
+    "d3-fetch": "^3.0.1",
+    "d3-format": "^3.1.0",
+    "d3-scale": "^4.0.0",
+    "d3-scale-chromatic": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "d3-shape": "^3.0.1"
+  }
+}
