@@ -6,7 +6,7 @@
  */
 import { select } from 'd3-selection';
 import { scaleLinear, scaleTime, scaleOrdinal } from 'd3-scale';
-import { max, min } from 'd3-array';
+import { max, min, group } from 'd3-array';
 import { line } from 'd3-shape';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 
@@ -20,12 +20,12 @@ const mdy = timeParse('%m.%d.%y');
  *
  * @since 2/8/22
  */
-const makeSinglePlot = (svg, textArea, data, size) => {
+const makeSinglePlot = (svg, textArea, data, size, entireData) => {
   const margin = {
     top: 30,
-    right: 80,
-    bottom: 10,
-    left: 50,
+    right: 30,
+    bottom: 20,
+    left: 40,
   };
   /*
       Create Scales:
@@ -33,8 +33,8 @@ const makeSinglePlot = (svg, textArea, data, size) => {
 
   const x = scaleTime()
     .domain([
-      min(data, (d) => min(d.vals, (b) => b.time)),
-      max(data, (d) => max(d.vals, (b) => b.time)),
+      min(entireData, (d) => min(d.vals, (b) => b.time)),
+      max(entireData, (d) => max(d.vals, (b) => b.time)),
     ])
     .range([margin.left, size.width - margin.right]);
 
@@ -54,9 +54,8 @@ const makeSinglePlot = (svg, textArea, data, size) => {
 
   textArea
     .selectAll('p')
-    .data(data)
-    .enter()
-    .append('p')
+    .data(data, (t) => t.title)
+    .join('p')
     .style('font-size', '10pt')
     .style('color', (d) => colors(d.title))
     .text((d) => d.title);
@@ -64,8 +63,7 @@ const makeSinglePlot = (svg, textArea, data, size) => {
   svg
     .selectAll('path')
     .data(data)
-    .enter()
-    .append('path')
+    .join('path')
     .attr('d', (d) => p(d.vals))
     .attr('fill', 'none')
     .attr('stroke-width', '2px')
@@ -77,13 +75,13 @@ const makeSinglePlot = (svg, textArea, data, size) => {
         { date: mdy('11.8.21'), text: 'Pass 1' },
         { date: mdy('11.16.21'), text: 'Pass 2' },
         { date: mdy('12.13.21'), text: 'Pass 3' },
-        { date: mdy('1.3.22'), text: 'Instruction Begins' },
+        { date: mdy('1.3.22'), text: 'Instruction' },
       ]
       : [
         { date: mdy('11.8.21'), text: '1' },
         { date: mdy('11.16.21'), text: 'Pass 2' },
         { date: mdy('12.13.21'), text: 'Pass 3' },
-        { date: mdy('1.3.22'), text: 'Instruction Begins' },
+        { date: mdy('1.3.22'), text: 'Instruction' },
       ];
 
   svg
@@ -115,22 +113,25 @@ const makeSinglePlot = (svg, textArea, data, size) => {
 
   svg
     .selectAll('lines')
-    .data([0.25, 0.5, 0.75, 1])
+    .data([0, 0.25, 0.5, 0.75, 1])
     .enter()
     .append('line')
     .attr('stroke', '#d3d3d3')
     .attr('x2', margin.left)
     .attr('x1', size.width - margin.right)
     .attr('y1', (d) => y(d))
-    .attr('y2', (d) => y(d));
+    .attr('y2', (d) => y(d))
+    .lower();
   svg
-    .selectAll('asd')
+    .selectAll('.dept-fillup-yaxis-text')
     .data([0.25, 0.5, 0.75, 1])
     .enter()
     .append('text')
+    .attr('font-size', '11pt')
+    .attr('class', 'dept-fillup-yaxis-text')
     .text((d) => d * 100 + (d === 1 ? '% of seats filled' : '%'))
-    .attr('x', margin.left - 25)
-    .attr('y', (d) => y(d));
+    .attr('x', margin.left - 40)
+    .attr('y', (d) => y(d) - 2);
 };
 
 const makePlot = (data) => {
@@ -154,15 +155,7 @@ const makePlot = (data) => {
     .style('width', '100%')
     .style('display', 'flex')
     .style('justify-content', 'flex-start')
-    .style('flex-direction', 'row');
-
-  const inputGroup = sel.append('div').style('margin-right', '10px');
-
-  inputGroup.append('p').text('Select Classes: ');
-
-  inputGroup.append('input');
-
-  const descText = sel.append('div');
+    .style('flex-direction', 'column');
 
   const size = {
     height: 400,
@@ -174,7 +167,118 @@ const makePlot = (data) => {
     .attr('height', size.height)
     .attr('width', size.width);
 
-  makeSinglePlot(svg, descText, data.slice(0, 3), size);
+  const inputGroup = sel
+    .append('div')
+    .style('margin-right', '10px')
+    .style('display', 'flex')
+    .style('width', '100%')
+    .style('flex-direction', 'row')
+    .style('justify-content', 'space-around')
+    .style('flex-wrap', 'wrap');
+
+  const div1 = inputGroup.append('div');
+
+  div1.append('p').text('Select a department: ');
+
+  div1
+    .append('select')
+    .on('change', (event, d) => {
+      const dept = select(event.target).node().value;
+      updateDept(dept);
+    })
+    .selectAll('option')
+    .data(
+      [...group(data, (d) => d.dept).keys()].sort((a, b) => (a < b ? -1 : 1)),
+    )
+    .enter()
+    .append('option')
+    .attr('value', (d) => d)
+    .text((d) => d);
+
+  const div2 = inputGroup.append('div');
+
+  div2.append('p').text('Select a course: ');
+
+  const getDeptData = (deptName) => data
+    .filter((d) => d.dept === deptName)
+    .map((d) => d.title)
+    .sort((a, b) => {
+      const [aNumLetter, ...a1] = a.replace(/^[^0-9]+/, '').split(' ');
+      const [bNumLetter, ...b1] = b.replace(/^[^0-9]+/, '').split(' ');
+
+      const aNum = parseInt(aNumLetter);
+      const bNum = parseInt(bNumLetter);
+      const aLetter = aNumLetter.match(/\w+/);
+      const bLetter = bNumLetter.match(/\w+/);
+      if (aNum !== bNum) {
+        return aNum - bNum;
+      }
+      return aLetter[0] < bLetter[0] ? -1 : 1;
+    });
+
+  const updateDept = (dept, first = false) => {
+    const selectedCoursesOption = div2
+      .selectAll('.coursefillup-dept-options')
+      .data([dept], (d) => d)
+      .join('select')
+      .attr('class', 'coursefillup-dept-options')
+      .style('height', '100px')
+      .attr('multiple', '')
+      .selectAll('option')
+      .data((d) => getDeptData(d))
+      .enter();
+
+    const selectedCourses = selectedCoursesOption
+      .append('option')
+      .attr('selected', (d) => (first
+        && ['ANTH 2 - INTRO CULT ANTHRO', 'ANTH 5 - INTRO BIO ANTH'].includes(d)
+        ? true
+        : null));
+
+    const getSelectedCourses = () => selectedCourses
+      .filter(function () {
+        return select(this).attr('selected') === 'true';
+      })
+      .data();
+
+    selectedCourses
+      .attr('value', (d) => d)
+      .text((d) => d)
+      .on('mousedown', function (e) {
+        e.preventDefault();
+        const val = select(this).attr('selected');
+        select(this).attr('selected', val === null ? true : null);
+
+        const selCourses = getSelectedCourses().map((title) => data.find((d) => d.title === title));
+        console.log(selCourses);
+        makeSinglePlot(svg, descText, selCourses, size, data);
+        return false;
+      });
+  };
+
+  const descDiv = sel
+    .append('div')
+    .style('margin-top', '5px')
+    .style('display', 'flex')
+    .style('width', '100%')
+    .style('flex-direction', 'row')
+    .style('justify-content', 'center')
+    .style('flex-wrap', 'wrap');
+
+  descDiv.append('p').text('Selected Courses:').style('margin-right', '5px');
+
+  const descText = descDiv.append('div');
+
+  updateDept('ANTH', true);
+  makeSinglePlot(
+    svg,
+    descText,
+    data.filter((d) => ['ANTH 2 - INTRO CULT ANTHRO', 'ANTH 5 - INTRO BIO ANTH'].includes(
+      d.title,
+    )),
+    size,
+    data,
+  );
 };
 
 export default makePlot;

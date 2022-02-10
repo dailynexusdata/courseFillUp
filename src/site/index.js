@@ -19,13 +19,21 @@ const main = async () => {
   const tp = timeParse('%m-%d-%Y-%H-%M-%S');
   const tpCourses = timeParse('%m-%d-%Y %H:%M:%S');
 
-  const nStudentsDept = (await json('../../dist/data/nStudentsDept.json')).map(
-    (d) => ({ ...d, date: tp(d.date) }),
+  const nStudentsDept = (
+    await json(
+      'https://raw.githubusercontent.com/dailynexusdata/courseFillUp/main/dist/data/nStudentsDept.json',
+    )
+  ).map((d) => ({ ...d, date: tp(d.date) }));
+
+  const deptsFilled = await json(
+    'https://raw.githubusercontent.com/dailynexusdata/courseFillUp/main/dist/data/deptsFilled.json',
   );
 
-  const deptsFilled = await json('../../dist/data/deptsFilled.json');
-
-  const coursesTs = (await json('../../dist/data/courses.json'))
+  const coursesTs = (
+    await json(
+      'https://raw.githubusercontent.com/dailynexusdata/courseFillUp/main/dist/data/courses.json',
+    )
+  )
     .filter((v) => v.vals.length > 1)
     .map((d) => ({
       ...d,

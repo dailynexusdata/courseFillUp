@@ -85,7 +85,6 @@ const makePlot = (data, start_idx = 0) => {
     .style('background-color', 'white')
     .on('click', function () {
       if (restart) {
-        console.log(data);
         resetVals();
         makePlot(data);
       }
@@ -131,7 +130,6 @@ const updatePlot = (data, i) => {
 };
 
 const play = (data, timestamp = null, start_idx = 0) => {
-  console.log('PLAYING', data.length, timestamp, start_idx, playing, start);
   let i;
   if (timestamp !== null) {
     if (start === null) {
@@ -140,12 +138,10 @@ const play = (data, timestamp = null, start_idx = 0) => {
     const factor = 10;
 
     if (!playing) {
-      console.log('not playing', timestamp, start_idx);
       start = timestamp - start_idx * factor;
     }
     const progress = timestamp - start;
     i = Math.floor(progress / factor);
-    console.log(start, i);
 
     if (i >= data.length) {
       // updatePlot(data, data.length - 1);

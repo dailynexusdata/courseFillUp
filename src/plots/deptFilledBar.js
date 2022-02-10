@@ -19,7 +19,6 @@ const makePlot = (data) => {
   /*
     Container Setup:
   */
-  console.log(data);
 
   // The class is necessary to apply styling
   const container = select('#coursefillup-bars')
@@ -53,6 +52,7 @@ const makePlot = (data) => {
     .style('display', 'flex')
     .style('width', '100%')
     .style('flex-direction', 'row')
+    .style('justify-content', 'center')
     .style('flex-wrap', 'wrap');
 
   const divs = divArea
@@ -94,7 +94,6 @@ const makePlot = (data) => {
     const s = select(this);
 
     const [dept, vals] = dat;
-    console.log(vals);
 
     const x = scaleLinear()
       .domain([0, 1])
